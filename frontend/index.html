@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FluxIDE</title>
+  <link rel="icon" href="../icon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;900&family=JetBrains+Mono:wght@300;400;500&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Animated background -->
+  <div class="bg-grid"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Splash screen -->
+  <div id="splash">
+    <div class="splash-logo">
+      <div class="splash-hex">
+        <svg viewBox="0 0 60 60" fill="none">
+          <polygon points="30,4 54,17 54,43 30,56 6,43 6,17" stroke="url(#hexGrad)" stroke-width="1.5" fill="none"/>
+          <polygon points="30,12 47,21.5 47,38.5 30,48 13,38.5 13,21.5" stroke="url(#hexGrad2)" stroke-width="0.8" fill="rgba(139,92,246,0.08)"/>
+          <path d="M22 30l5 5 11-11" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="hexGrad" x1="0" y1="0" x2="60" y2="60">
+              <stop offset="0%" stop-color="#8b5cf6"/>
+              <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+            <linearGradient id="hexGrad2" x1="0" y1="0" x2="60" y2="60">
+              <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="splash-title">FluxIDE</div>
+      <div class="splash-sub">LIVE AGENT IDE</div>
+      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+      <div class="splash-status" id="splashStatus">Initializing AI core...</div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-hex">
+          <svg viewBox="0 0 40 40" fill="none">
+            <polygon points="20,3 36,12 36,28 20,37 4,28 4,12" stroke="url(#sHex)" stroke-width="1.2" fill="rgba(139,92,246,0.1)"/>
+            <path d="M14 20l4 4 8-8" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="sHex" x1="0" y1="0" x2="40" y2="40">
+                <stop offset="0%" stop-color="#8b5cf6"/>
+                <stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-name">FluxIDE</div>
+          <div class="logo-tagline">LIVE AGENT IDE</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group-label">WORKSPACE</div>
+        <a class="nav-item active" data-page="generate" onclick="switchPage('generate')">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1L2 4.5v6L7.5 14 13 10.5v-6L7.5 1z" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1v13M2 4.5l5.5 3.5 5.5-3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          Generate Code
+          <span class="nav-badge">AI</span>
+        </a>
+        <a class="nav-item" data-page="projects" onclick="switchPage('projects')">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+          </span>
+          My Projects
+        </a>
+        <a class="nav-item" data-page="templates" onclick="switchPage('templates')">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M2 7.5h7M2 11h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          Templates
+        </a>
+
+        <div class="nav-group-label" style="margin-top:20px">TOOLS</div>
+        <a class="nav-item" onclick="openSerial()">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="3" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6.5h1M7 6.5h1M10 6.5h1M4 9h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          Serial Monitor
+        </a>
+        <a class="nav-item" onclick="openBoardManager()">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="4" width="11" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 4V3M10 4V3M4 11v1M11 11v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          Board Manager
+        </a>
+        <a class="nav-item" onclick="openPinout()">
+          <span class="nav-icon">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1v4M4 5h7M4 5v4a3.5 3.5 0 007 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Pinout Reference
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="board-status" id="boardStatus">
+          <div class="board-pulse"></div>
+          <div class="board-info">
+            <div class="board-name" id="boardName">Arduino Uno</div>
+            <div class="board-port" id="boardPort">No COM port selected</div>
+          </div>
+          <div class="board-signal">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="sidebar-bottom-btns">
+          <button class="icon-btn" title="Voice Input" onclick="toggleVoice()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="4.5" y="1" width="5" height="7" rx="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 7.5a5 5 0 0010 0M7 12.5v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" title="Settings" onclick="openSettings()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.6 2.6l1.1 1.1M10.3 10.3l1.1 1.1M2.6 11.4l1.1-1.1M10.3 3.7l1.1-1.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(139,92,246,0.15);">
+          <div style="font-size: 12px; font-weight: 700; color: var(--accent-light); font-family: var(--font-display); letter-spacing: 0.5px; margin-bottom: 6px;">
+            Founder: <span style="color: var(--text-primary);">Maram Reddy Rishan Reddy</span>
+          </div>
+          <div style="font-size: 12px; font-weight: 700; color: var(--cyan-light); font-family: var(--font-display); letter-spacing: 0.5px;">
+            Co-Founder: <span style="color: var(--text-primary);">Ajit Tanti</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn" id="sidebarToggle" onclick="toggleSidebar()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+          <div class="breadcrumb">
+            <span class="bc-home">FluxIDE</span>
+            <span class="bc-sep">/</span>
+            <span class="bc-current" id="bcCurrent">Generate Code</span>
+          </div>
+        </div>
+        <div class="topbar-center">
+          <div class="model-selector" onclick="openAgentSettings()">
+            <div class="model-dot"></div>
+            <span id="modelLabel">Agent Model · Not configured</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="status-chip chip-ai">
+            <span class="chip-dot"></span> Agent Ready
+          </div>
+          <div class="status-chip chip-board" id="boardChip">
+            <span class="chip-dot"></span> Board Detected
+          </div>
+          <button class="primary-btn sm" onclick="openAgentSettings()">Agent</button>
+          <button class="primary-btn sm" onclick="flashCode()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M6.5 1L2 7h4v4l4.5-6H7V1z"/></svg>
+            Upload
+          </button>
+        </div>
+      </header>
+
+      <!-- Page: Generate -->
+      <div class="page active" id="page-generate">
+        <div class="generate-layout">
+
+          <!-- Left column -->
+          <div class="gen-left">
+
+            <div class="glass-card prompt-card">
+              <div class="card-label">PROMPT</div>
+              <textarea
+                id="promptInput"
+                class="prompt-textarea"
+                placeholder="Describe what you want your controller to do...&#10;&#10;e.g. Blink LED on pin 13 every 500ms and log to serial"
+                oninput="autoResize(this)"
+              >Blink the built-in LED on pin 13 every 500ms and print a status message to serial monitor.</textarea>
+
+              <div class="card-label compact-label">SUB PROMPT</div>
+              <textarea
+                id="subPromptInput"
+                class="prompt-textarea sub-prompt-textarea"
+                placeholder="Define the project, constraints, files, hardware, style, libraries, backend requirements..."
+                oninput="autoResize(this)"
+              >Project: embedded controller sketch. Keep code readable, complete, and ready to save as sketch.ino.</textarea>
+
+              <div class="prompt-chips">
+                <span class="p-chip" onclick="insertPrompt('Blink LED on pin 13 every 500ms')">Blink LED</span>
+                <span class="p-chip" onclick="insertPrompt('Control a servo motor to sweep from 0 to 180 degrees')">Servo sweep</span>
+                <span class="p-chip" onclick="insertPrompt('Read DHT11 temperature and humidity sensor and print values')">DHT sensor</span>
+                <span class="p-chip" onclick="insertPrompt('PWM fade an LED in and out smoothly on pin 9')">PWM fade</span>
+                <span class="p-chip" onclick="insertPrompt('Drive two DC motors with L298N motor driver')">DC motors</span>
+                <span class="p-chip" onclick="insertPrompt('Display text on I2C OLED 128x64 display')">OLED display</span>
+              </div>
+
+              <div class="prompt-footer">
+                <div class="board-select-row">
+                  <label class="sel-label">Board</label>
+                  <select class="glass-select" id="boardSelect" onchange="updateBoard()">
+                    <optgroup label="── Arduino ──">
+                      <option>Arduino Uno</option>
+                      <option>Arduino Mega 2560</option>
+                      <option>Arduino Nano</option>
+                      <option>Arduino Nano Every</option>
+                      <option>Arduino Leonardo</option>
+                      <option>Arduino Micro</option>
+                      <option>Arduino Due</option>
+                      <option>Arduino Pro Mini</option>
+                      <option>Arduino MKR WiFi 1010</option>
+                    </optgroup>
+                    <optgroup label="── Espressif ──">
+                      <option>ESP32 DevKit V1</option>
+                      <option>ESP32-S2</option>
+                      <option>ESP32-S3</option>
+                      <option>ESP32-C3</option>
+                      <option>ESP8266 NodeMCU</option>
+                      <option>ESP8266 Wemos D1 Mini</option>
+                    </optgroup>
+                    <optgroup label="── Raspberry Pi ──">
+                      <option>Raspberry Pi Pico</option>
+                      <option>Raspberry Pi Pico W</option>
+                      <option>Raspberry Pi Pico 2</option>
+                    </optgroup>
+                    <optgroup label="── STM32 ──">
+                      <option>STM32 Blue Pill</option>
+                      <option>STM32 Black Pill</option>
+                      <option>STM32 Nucleo F401RE</option>
+                    </optgroup>
+                    <optgroup label="── Other ──">
+                      <option>Teensy 4.1</option>
+                      <option>Teensy 4.0</option>
+                      <option>nRF52840 (Adafruit)</option>
+                      <option>SAMD21 (Feather M0)</option>
+                      <option>ATtiny85</option>
+                      <option>ATmega32U4</option>
+                    </optgroup>
+                  </select>
+                  <label class="sel-label" style="margin-left:12px">Language</label>
+                  <select class="glass-select" id="langSelect">
+                    <option>C++ (Arduino)</option>
+                    <option>MicroPython</option>
+                    <option>CircuitPython</option>
+                  </select>
+                </div>
+                <button class="primary-btn generate-btn" id="generateBtn" onclick="generateCode()">
+                  <span class="btn-icon-wrap">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><path d="M7 0.5l1.8 5.2H14l-4.4 3.2 1.7 5.1L7 11l-4.3 3 1.7-5.1L0 5.7h5.2z"/></svg>
+                  </span>
+                  <span class="btn-text">Generate Code</span>
+                  <span class="btn-shine"></span>
+                </button>
+                <div class="project-action-row">
+                  <button class="secondary-btn" onclick="chooseProjectFolder()">Folder</button>
+                  <button class="secondary-btn" onclick="newProject()">Create</button>
+                  <button class="secondary-btn" onclick="saveCurrentFile()">Save File</button>
+                  <button class="secondary-btn" onclick="saveCurrentProject()">Save Project</button>
+                  <button class="secondary-btn" onclick="exportProjectZip()">Zip</button>
+                </div>
+                <div class="folder-path" id="folderPath">No project folder selected</div>
+              </div>
+            </div>
+
+            <!-- Stats row -->
+            <div class="stats-row">
+              <div class="stat-card">
+                <div class="stat-val" id="stat-tokens">—</div>
+                <div class="stat-label">Tokens used</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="stat-lines">—</div>
+                <div class="stat-label">Lines of code</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="stat-size">—</div>
+                <div class="stat-label">Flash size</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-val" id="stat-time">—</div>
+                <div class="stat-label">Gen time (s)</div>
+              </div>
+            </div>
+
+            <!-- History -->
+            <div class="glass-card">
+              <div class="card-label">RECENT GENERATIONS</div>
+              <div class="history-list" id="historyList">
+                <div class="history-item" onclick="loadHistory(0)">
+                  <div class="h-icon" style="background:rgba(139,92,246,0.2);color:#a78bfa">S</div>
+                  <div class="h-info">
+                    <div class="h-name">Servo sweep 0–180°</div>
+                    <div class="h-meta">Arduino Uno · 42 lines</div>
+                  </div>
+                  <div class="h-time">2m ago</div>
+                </div>
+                <div class="history-item" onclick="loadHistory(1)">
+                  <div class="h-icon" style="background:rgba(6,182,212,0.2);color:#67e8f9">D</div>
+                  <div class="h-info">
+                    <div class="h-name">DHT11 temp + humidity</div>
+                    <div class="h-meta">Arduino Uno · 58 lines</div>
+                  </div>
+                  <div class="h-time">14m ago</div>
+                </div>
+                <div class="history-item" onclick="loadHistory(2)">
+                  <div class="h-icon" style="background:rgba(245,158,11,0.2);color:#fcd34d">O</div>
+                  <div class="h-info">
+                    <div class="h-name">OLED clock display</div>
+                    <div class="h-meta">ESP32 · 91 lines</div>
+                  </div>
+                  <div class="h-time">1h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: Code editor -->
+          <div class="gen-right">
+            <div class="glass-card code-card">
+              <div class="code-topbar">
+                <div class="code-tabs">
+                  <button class="code-tab active" id="tab-ino" onclick="switchTab('ino')">sketch.ino</button>
+                  <button class="code-tab" id="tab-output" onclick="switchTab('output')">output.log</button>
+                  <button class="code-tab" id="tab-explain" onclick="switchTab('explain')">explain</button>
+                  <button class="code-tab" id="tab-connections" onclick="switchTab('connections')">connections</button>
+                  <button class="code-tab" id="tab-terminal" onclick="switchTab('terminal')">terminal</button>
+                </div>
+                <div class="code-actions">
+                  <button class="secondary-btn" style="padding:4px 8px; font-size:12px; margin-right:4px; display:flex; align-items:center; gap:4px;" onclick="promptInstallLib()">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Install Lib
+                  </button>
+                  <button class="secondary-btn" style="padding:4px 8px; font-size:12px; margin-right:4px; display:flex; align-items:center; gap:4px;" onclick="installZipLib()">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2h3l1 1h4v7H2V2z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Zip Lib
+                  </button>
+                  <button class="secondary-btn" style="padding:4px 8px; font-size:12px; margin-right:4px; display:flex; align-items:center; gap:4px;" onclick="autoInstallLibraries()">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v6M3.5 4.5L6 7l2.5-2.5M2 9v1h8V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Auto Install
+                  </button>
+                  <div class="gen-status hidden" id="genStatus"><span class="gen-check">✓</span> Generating your code</div>
+                  <button class="icon-btn" title="Copy code" onclick="copyCode()">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 9V2a1 1 0 011-1h7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  </button>
+                  <button class="icon-btn" title="Download" onclick="downloadCode()">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 6l2.5 2.5L9 6M2 10.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="icon-btn" title="Fullscreen" onclick="toggleFullscreen()">
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 4.5V1h3.5M8.5 1H12v3.5M12 8.5V12H8.5M4.5 12H1V8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="code-body" id="code-ino">
+                <pre class="code-pre" id="codeDisplay"><span class="c-comment">// FluxIDE</span>
+<span class="c-comment">// Click "Generate Code" to create your sketch</span>
+<span class="c-comment">// ─────────────────────────────────────────</span>
+
+<span class="c-kw">const int</span> <span class="c-var">LED_PIN</span> = <span class="c-num">13</span>;
+<span class="c-kw">const int</span> <span class="c-var">BLINK_MS</span> = <span class="c-num">500</span>;
+
+<span class="c-fn">void</span> <span class="c-kw">setup</span>() {
+  pinMode(<span class="c-var">LED_PIN</span>, OUTPUT);
+  Serial.begin(<span class="c-num">9600</span>);
+  Serial.println(<span class="c-str">"FluxIDE Ready - Waiting for prompt"</span>);
+}
+
+<span class="c-fn">void</span> <span class="c-kw">loop</span>() {
+  <span class="c-comment">// Your generated code will appear here</span>
+}</pre>
+              </div>
+
+              <div class="code-body hidden" id="code-output">
+                <pre class="code-pre c-log" id="outputDisplay">[ Waiting for compilation... ]
+</pre>
+              </div>
+
+              <div class="code-body hidden" id="code-explain">
+                <div class="explain-body" id="explainDisplay">
+                  <p style="color:var(--text-muted)">Generate code to see an explanation here.</p>
+                </div>
+              </div>
+
+              <div class="code-body hidden" id="code-connections">
+                <div class="explain-body" id="connectionsDisplay">
+                  <p style="color:var(--text-muted)">Hardware connections will appear here...</p>
+                </div>
+              </div>
+
+              <div class="code-body hidden" id="code-terminal" style="display: flex; flex-direction: column;">
+                <div class="explain-body" id="terminalOutput" style="flex: 1; overflow-y: auto; padding-bottom: 10px; font-family: var(--font-code); font-size: 12px; white-space: pre-wrap;">
+                  <span style="color:var(--accent-light);">FluxIDE</span> Terminal<br>
+                </div>
+                <div style="display: flex; gap: 8px; border-top: 1px solid var(--glass-border); padding-top: 8px; padding-left: 14px; padding-right: 14px;">
+                  <span style="color: var(--accent); font-family: var(--font-code); padding-top: 8px;">></span>
+                  <input type="text" id="terminalInput" style="flex: 1; background: transparent; border: none; color: var(--text-primary); font-family: var(--font-code); font-size: 13px; outline: none; padding: 8px 0;" placeholder="arduino-cli core list" onkeydown="handleTerminalCommand(event)">
+                </div>
+              </div>
+
+              <!-- Flash section -->
+              <div class="flash-section">
+                <div class="flash-meta">
+                  <div class="flash-stat">
+                    <span class="fs-label">Upload</span>
+                    <span class="fs-val" id="compileStatus">—</span>
+                  </div>
+                  <div class="flash-stat">
+                    <span class="fs-label">Size</span>
+                    <span class="fs-val" id="sketchSize">—</span>
+                  </div>
+                  <div class="flash-stat">
+                    <span class="fs-label">Board</span>
+                    <span class="fs-val" id="flashBoard">Arduino Uno</span>
+                  </div>
+                </div>
+                <div class="flash-progress" id="flashProgress" style="display:none">
+                  <div class="fp-track"><div class="fp-fill" id="fpFill"></div></div>
+                  <span class="fp-label" id="fpLabel">Flashing...</span>
+                </div>
+                <button class="flash-btn" id="flashBtn" onclick="flashCode()">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M9 1L3 9h5v6l5-8H8V1z"/></svg>
+                  Upload to <span id="flashBoardName">Select port</span>
+                  <span class="btn-shine"></span>
+                </button>
+              </div>
+              <!-- Error box -->
+              <div class="error-box hidden" id="errorBox">
+                <div class="error-header">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L1 12h12L7 1zM7 5v3M7 10v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Errors Detected
+                </div>
+                <div class="error-content" id="errorContent"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page: Projects -->
+      <div class="page" id="page-projects">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-h2">My Projects</h2>
+            <button class="primary-btn sm" onclick="newProject()">+ New Project</button>
+          </div>
+          <div class="projects-grid" id="projectsGrid"></div>
+        </div>
+      </div>
+
+      <!-- Page: Templates -->
+      <div class="page" id="page-templates">
+        <div class="page-inner">
+          <div class="page-header">
+            <h2 class="page-h2">Templates</h2>
+            <div class="search-box">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M9 9l2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              <input type="text" placeholder="Search templates..." class="search-input" oninput="filterTemplates(this.value)"/>
+            </div>
+          </div>
+          <div class="templates-grid" id="templatesGrid"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modals -->
+  <div class="modal-overlay hidden" id="serialModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title">Serial Monitor</span>
+        <button class="icon-btn" onclick="closeModal('serialModal')">x</button>
+      </div>
+      <div class="serial-log" id="serialLog">
+        <div class="log-line"><span class="log-ts">00:00:01</span> FluxIDE Serial Monitor initialized</div>
+        <div class="log-line"><span class="log-ts">00:00:01</span> Baud rate: 9600</div>
+      </div>
+      <div class="serial-input-row">
+        <input type="text" class="serial-input" placeholder="Send command..." id="serialCmd" onkeydown="if(event.key==='Enter') sendSerial()"/>
+        <button class="primary-btn sm" onclick="sendSerial()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="boardModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title">Board Manager</span>
+        <button class="icon-btn" onclick="closeModal('boardModal')">x</button>
+      </div>
+      <div class="boards-list">
+        <div class="board-detect-head">
+          <div>
+            <div class="bi-name">Detected COM Ports</div>
+            <div class="bi-port" id="portScanStatus">Scan to find connected boards</div>
+          </div>
+          <button class="primary-btn sm" onclick="scanBoards(true)">Detect</button>
+        </div>
+        <div id="detectedPortsList" class="detected-ports-list">
+          <div class="empty-ports">No ports scanned yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="pinoutModal">
+    <div class="modal glass-card" style="max-width:520px">
+      <div class="modal-header">
+        <span class="modal-title">Pinout — Arduino Uno</span>
+        <button class="icon-btn" onclick="closeModal('pinoutModal')">x</button>
+      </div>
+      <div class="pinout-grid" id="pinoutGrid"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title">Settings</span>
+        <button class="icon-btn" onclick="closeModal('settingsModal')">x</button>
+      </div>
+      <div class="settings-list">
+        <div class="setting-row">
+          <div><div class="s-label">Particle Effects</div><div class="s-sub">Background animation</div></div>
+          <label class="toggle"><input type="checkbox" checked onchange="toggleParticles(this.checked)"/><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><div class="s-label">Auto-detect Board</div><div class="s-sub">Scan USB on startup</div></div>
+          <label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><div class="s-label">AI Model</div><div class="s-sub" id="settingsModelLabel">Open Agent settings to configure</div></div>
+          <button class="primary-btn sm" onclick="openAgentSettings()">Agent Settings</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="s-label">Theme Accent</div><div class="s-sub">Primary color</div></div>
+          <div style="display:flex;gap:6px">
+            <div class="color-swatch" style="background:#8b5cf6" onclick="setAccent('#8b5cf6','#a78bfa')"></div>
+            <div class="color-swatch" style="background:#06b6d4" onclick="setAccent('#06b6d4','#67e8f9')"></div>
+            <div class="color-swatch" style="background:#10b981" onclick="setAccent('#10b981','#6ee7b7')"></div>
+            <div class="color-swatch" style="background:#f59e0b" onclick="setAccent('#f59e0b','#fcd34d')"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="agentModal">
+    <div class="modal glass-card">
+      <div class="modal-header">
+        <span class="modal-title">Agent Settings</span>
+        <button class="icon-btn" onclick="closeModal('agentModal')">x</button>
+      </div>
+      <div class="settings-list">
+        <div class="agent-field">
+          <label class="sel-label">API URL</label>
+          <input id="agentApiUrl" class="glass-input" value="https://api.openai.com/v1/chat/completions" />
+        </div>
+        <div class="agent-field">
+          <label class="sel-label">API Key</label>
+          <input id="agentApiKey" class="glass-input" type="password" placeholder="Enter your agent API key" />
+        </div>
+        <div class="agent-field">
+          <label class="sel-label">Model</label>
+          <input id="agentModel" class="glass-input" value="gpt-4.1-mini" placeholder="gpt-4.1-mini, claude-sonnet, etc." />
+        </div>
+        <button class="primary-btn generate-btn" onclick="confirmAgentSettings()">Confirm Agent</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

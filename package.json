@@ -1,0 +1,33 @@
+{
+  "name": "fluxide",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "author": "FluxIDE Team",
+  "description": "An advanced AI-powered embedded development environment.",
+  "build": {
+    "appId": "com.fluxide.app",
+    "productName": "FluxIDE",
+    "win": {
+      "icon": "icon.ico",
+      "target": ["nsis"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FluxIDE",
+      "artifactName": "FluxIDE-Setup-${version}.exe",
+      "uninstallDisplayName": "FluxIDE"
+    }
+  }
+}
