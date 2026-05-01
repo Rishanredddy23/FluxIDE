@@ -3,7 +3,12 @@
 **FluxIDE** is a modern AI-powered development environment for Arduino and embedded systems.
 It lets you generate, edit, and upload code to your microcontroller — all in one place.
 
----
+Download----
+## 🚀 Download FluxIDE
+
+👉 https://github.com/Rishanredddy23/FluxIDE/releases/latest
+
+---------
 
 ## 🚀 Features
 
@@ -76,7 +81,8 @@ New features are added regularly.
 
 ## 👨‍💻 Author
 
-**Rishan Reddy**
+**Rishan Reddy** as Founder
+**Ajit Tanti** as Co founder
 Creator of FluxIDE
 
 ---
