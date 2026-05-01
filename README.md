@@ -1,5 +1,20 @@
 # ⚡ FluxIDE
 
+> AI-powered Arduino IDE
+
+## 🚀 Download
+👉 https://github.com/Rishanredddy23/FluxIDE/releases/latest
+
+## 📸 Screenshots
+(Add images here later)
+
+## ✨ Features
+- AI code generation
+- One-click upload
+- Serial monitor
+
+-------------------
+
 **FluxIDE** is a modern AI-powered development environment for Arduino and embedded systems.
 It lets you generate, edit, and upload code to your microcontroller — all in one place.
 
